@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="indexstyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <form class="modal-content" action="/action_page.php">
+        <div class="container">
+          <h1>Please Pay</h1>
+          <p>Please fill in this form to pay.</p>
+          <hr>
+          <label ><b>Card Holder Name</b></label>
+          <input id="modal1_name" type="text" placeholder="Enter Card Number" name="name" required>
+          <label ><b>Card Number</b></label>
+          <input id="modal1_number" type="text" placeholder="Enter Card Number" name="name" required>
+          <label ><b>Card cvc</b></label>
+          <input id="modal1_cvc" type="text" placeholder="Enter cvc" name="surname" required>
+          <label ><b>Card expiration date</b></label>
+          <input id="modal1_date" type="date" value="1996-10-15"  name="address" required>
+         
+          
+         
+          <div class="clearfix">
+            <button type="button"  class="cancelbtn">Cancel</button>
+            <button id='cardDetails'  type="submit" class="signupbtn">Pay</button>
+          </div>
+        </div>
+      </form>
+      <div id="id02" class="modal">
+        <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <form class="modal-content" >
+          <div id='reservationid' class="container">
+           
+           
+            
+           
+            <div class="clearfix">
+              <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
+              
+            </div>
+          </div>
+      </div>
+</body>
+<script>
+     document.addEventListener("click",
+    function askForDetails(e){
+        var element=e.target
+          if(element.id == 'cardDetails'){
+
+            e.preventDefault()
+            var cardname=document.getElementById('modal1_name').value
+            var carnnum=document.getElementById('modal1_number').value
+            var cardcvc=document.getElementById('modal1_cvc').value
+            var carddate=document.getElementById('modal1_date').value
+            var userid= window.localStorage.getItem("userId");
+
+            axios.post('http://localhost:8080/flight/addCard',null, { params:{
+              
+            userId: userid,
+            cardname:cardname,
+            cardnum:carnnum,
+            cardcvc:cardcvc,
+            carddate:carddate,
+        }
+          
+        })
+        .then(function (response) {
+           
+          })
+        .catch(function (error) {
+          console.log(error);
+        })
+        axios.post('http://localhost:8080/flight/addReservation',null, { params:{
+              
+              userId: userid,
+              flightId:window.localStorage.getItem("flightId"),
+              }
+                
+              })
+              .then(function (response) {
+                  if(response.data='Saved'){
+                    if(response.data='success'){
+                var reservation=document.getElementById('reservationid')
+                var resid=window.localStorage.getItem("flightId")
+                var id=document.createElement("h1")
+                id.innerText=`Congrats you made a reservation`
+                reservation.appendChild(id)
+                var id=document.createElement("h1")
+                id.innerText=`Reservation ID=${resid} `
+                reservation.appendChild(id)
+                var id=document.createElement("h3")
+                id.innerText=`Take this down as you will need it to view your reservation in the future`
+                reservation.appendChild(id) 
+               
+            document.getElementById('id02').style.display='block'       
+            }
+                  }
+                })
+              .catch(function (error) {
+                console.log(error);
+              })}
+        })
+        function pay(){
+             }
+</script>
+</html>
+
+

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="indexstyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+    <form class="modal-content" >
+        <div class="container">
+          <h1>Edit Card Details</h1>
+          <p>Edit any card details and press save</p>
+          <hr>
+          <label ><b>Card Holder Name</b></label>
+          <input id="cardname" type="text" placeholder="Enter Card Number" required>
+          <label  ><b>Card Number</b></label>
+          <input  type="text" id="cardnum" placeholder="Enter Card Number"  required>
+          <label ><b>Card cvc</b></label>
+          <input  id="cardcvc" type="text" placeholder="Enter cvc"  required>
+          <label ><b>Card expiration date</b></label>
+          <input id="date" type="date" value="1996-10-15"  name="address" required>
+         
+          
+         
+          <div class="clearfix">
+            <button type="button"  class="cancelbtn">Cancel</button>
+            <button id='save'  type="submit" class="signupbtn">Save</button>
+          </div>
+        </div>
+      </form>
+</body>
+<script>
+    
+    axios.post('http://localhost:8080/flight/getCard',null, { params:{
+    
+    cardId: window.localStorage.getItem('cardId'),
+    }
+  
+})
+.then(function (response) {
+    card=response.data
+    console.log(card)
+    document.getElementById('cardname').setAttribute('value',card.cardname)
+   document.getElementById('cardnum').setAttribute('value',card.cardnum)
+   document.getElementById('cardcvc').setAttribute('value',card.cardcvc)
+   
+})
+.catch(function (err){
+    console.log(err)
+})
+
+          document.addEventListener("click",
+    function editCard(e){
+        e.preventDefault();
+        if(e.target.id=='save'){
+                var cardname=document.getElementById('cardname').value
+                var cardnum=document.getElementById('cardnum').value
+                var cardcvc=document.getElementById('cardcvc').value
+                var carddate=document.getElementById('date').value
+                console.log(cardname,cardnum,cardcvc)
+                axios.post('http://localhost:8080/flight/editCard',null, { params:{
+                
+                cardId: window.localStorage.getItem('cardId'),
+                cardname:cardname,
+                cardnum:cardnum,
+                cardcvc:cardcvc,
+                carddate:carddate,
+            }
+                
+            })
+            .then(function (response) {
+                window.location.replace('./editCards.html')
+                })
+            .catch(function (error) {
+                console.log(error);
+            })
+
+        }
+    })
+</script>
+</html>

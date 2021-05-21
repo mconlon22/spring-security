@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/frontend/loginstyle.css">
+
+
+    <title>Document</title>
+    
+</head>
+<body>
+    <form action="action_page.php" method="post">
+        <div class="imgcontainer">
+        </div>
+      
+        <div class="container">
+          <label ><b>Email</b></label>
+          <input id="email" type="text" placeholder="Enter Email" name="uname" required>
+      
+          <label for="psw"><b>Password</b></label>
+          <input id="password"  type="password" placeholder="Enter Password" name="psw" required>
+      
+          <button id="login" type="submit">Login</button>
+          <label>
+            <input type="checkbox" checked="checked" name="remember"> Remember me
+          </label>
+        </div>
+      
+        <div class="container" style="background-color:#f1f1f1">
+          <button type="button" id="cancel" class="cancelbtn">Cancel</button>
+          <span class="psw">Forgot <a href="#">password?</a></span>
+        </div>
+      </form>
+    
+</body>
+
+<script>
+    document.addEventListener('click',function(e){
+        e.preventDefault();
+        var email =document.getElementById('email').value
+        var password=document.getElementById('password').value
+console.log(email,password)
+        if(e.target.id =="cancel"){
+            console.log(e.target.value)
+            window.location.replace("./index.html");
+        }
+        if(e.target.id=='login'){
+        }
+        let config = {
+            headers: { 
+        'Accept': 'application/json',
+        'Content-Type': 'application/json' 
+    }}
+   
+        let data = {username:email,password:password}
+    
+
+            axios.post('http://localhost:8080/api/auth/signin',data,config)
+            .then(function(response){
+                console.log(response.data.accessToken)
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`
+
+                window.localStorage.setItem('token', response.data.accessToken);
+
+                window.localStorage.setItem('user', response.data);
+                window.localStorage.setItem('userId', response.data.id);
+                window.localStorage.setItem('logged_in', 'true');
+                window.location.replace("./reservationspage.html");
+
+
+
+            })
+
+        }
+    )
+</script>
+</html>

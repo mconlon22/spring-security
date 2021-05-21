@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/frontend/indexstyle.css">
+
+    <title>Document</title>
+</head>
+<body>
+    <nav  class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">British Airways</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item ">
+              <a class="nav-link" href="/frontend/index.html">Add Flight <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/frontend/reservationspage.html">My Flights</a>
+            </li>
+           
+           
+          </ul>
+        </div>
+      </nav>
+
+
+</body>
+<script>
+    //creates the table 
+    var userId=window.localStorage.getItem('userId')
+    const config = {
+       headers: { 'Authorization': `${window.localStorage.getItem('token')}` }
+   };
+
+const bodyParameters = {
+   key: "value"
+};
+axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+
+    axios.post('http://localhost:8080/api/reservation/getUserReservations',null,bodyParameters
+)
+          .then(function (response) {
+            var user=response.data
+            console.log(user)
+              var reservations=response.data.reservations
+              var body = document.getElementsByTagName('body')[0];
+            var tbl = document.createElement('table');
+            tbl.classList.add('table')
+            
+
+            tbl.style.width = '100%';
+            tbl.setAttribute('border', '1');
+            var tbdy = document.createElement('tbody');
+            for (var i = 0; i < reservations.length; i++) {
+                var tr = document.createElement('tr');
+                var datestr=sqlToJsDate(reservations[i].departureTime)
+                
+                console.log('datestr')
+
+                console.log(datestr)
+                var departing = document.createElement('td');
+                departing.appendChild(document.createTextNode(reservations[i].departing))
+                tr.appendChild(departing)
+                var destination = document.createElement('td');
+                destination.appendChild(document.createTextNode(reservations[i].destination))
+                tr.appendChild(destination)
+                var date = document.createElement('td');
+                date.appendChild(document.createTextNode(datestr))
+                tr.appendChild(date)
+                var name = document.createElement('td');
+                name.appendChild(document.createTextNode(`${user.firstname} ${user.surname}`))
+                tr.appendChild(name)
+                var date = document.createElement('td');
+                var b = document.createElement('button');
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",reservations[i].id);
+                //setting the attribute of 
+                b.setAttribute("id",'Cancel');
+
+                b.appendChild(document.createTextNode("Cancel"));
+                date.appendChild(b)
+                tr.appendChild(date )
+
+               
+                
+                tbdy.appendChild(tr);
+            }
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl)
+            })
+          .catch(function (error) {
+            console.log(error);
+          })
+  
+
+
+        </script>
+    <script> 
+      //load login or logout buttons
+                var nav=document.getElementById("nav")
+                var b = document.createElement('button');
+                var b1 = document.createElement('button');
+                console.log(window.localStorage.getItem("logged_in")=="false")
+                if(window.localStorage.getItem("logged_in")=="false"||window.localStorage.getItem("logged_in")==null){
+
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",'login');
+                b.appendChild(document.createTextNode("login"));
+                nav.appendChild(b)
+                b1.setAttribute("class","btn");
+                b1.classList.add("btn-primary");
+                b1.setAttribute("value",'signUp');
+                b1.appendChild(document.createTextNode("Sign up as Executive Member"));
+                nav.appendChild(b1)
+
+               }
+                else{
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",'logout');
+                b.appendChild(document.createTextNode("logout"));
+                nav.appendChild(b)
+                b1.setAttribute("class","btn");
+                b1.classList.add("btn-primary");
+                b1.setAttribute("value",'account');
+                b1.appendChild(document.createTextNode("My Account"));
+                nav.appendChild(b1)
+                }
+
+                document.addEventListener("click",
+                function(e) {
+                  if(e.target.value =="logout"){
+
+                    console.log(e.target.value)
+                    window.localStorage.setItem('logged_in', "false");
+                    window.localStorage.setItem('userId', null);
+                    window.localStorage.removeItem('user');
+
+                    location.reload();
+
+
+                  }
+                  if(e.target.value =="login"){
+
+                    console.log(e.target.value)
+                    window.location.replace("./login.html");
+
+
+}
+if(e.target.value =="signUp"){
+      console.log(e.target.value)
+      window.location.replace("./signUp.html");
+}
+if(e.target.value =="account"){
+      console.log(e.target.value)
+      window.location.replace("./editDetails.html");
+}
+                })
+
+                
+                
+                </script>
+<script>
+    function sqlToJsDate(sqlDate){
+        var sqlDateArr1 = sqlDate.split("-");
+        var sYear = sqlDateArr1[0];
+        var sMonth = (Number(sqlDateArr1[1]) - 1).toString();
+        var sqlDateArr2 = sqlDateArr1[2].split(" ");
+        var sDay = sqlDateArr2[0].split("T")[0];
+        var sqlDateArr3 = sqlDateArr2[0].split(":");
+        var sHour = sqlDateArr3[0].split("T")[1];
+    
+        var sMinute = sqlDateArr3[1];
+        var sqlDateArr4 = sqlDateArr3[2].split(".");
+        //format of sqlDateArr4[] = ['ss','ms']
+        var sSecond = sqlDateArr4[0];
+        var sMillisecond = sqlDateArr4[1];
+         var datestr=`${sHour}:${sMinute}  ${sDay}/${sYear}/${sMonth}  `
+        return datestr
+    }
+
+//handles canceling flights
+    document.addEventListener("click",
+                function(e) {
+                  if(e.target.id =="Cancel"){
+                    var flightId=e.target.value;
+                    console.log(e.target.value)
+                   
+
+                            axios.post('http://localhost:8080/flight/removeReservation',null, { params:{
+                        
+                        userId: window.localStorage.getItem('userId'),
+                                flightId: flightId
+                    }
+                    
+                    })
+                    .then(function (response) {
+                        location.reload();
+
+                    })
+                    .catch(function (error) {
+                    console.log(error);
+                    })
+
+
+                  }
+                 
+                  })
+                  
+
+    </script>
+</html>

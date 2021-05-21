@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="indexstyle.css">
+
+    
+</head>
+<body>  
+  <nav  class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">British Airways</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item ">
+          <a class="nav-link" href="./index.html">Add Flight <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./reservationspage.html">My Flights</a>
+        </li>
+       
+       
+      </ul>
+    </div>
+  </nav>
+    <div class="container">
+    <form  onsubmit="searchFlights()">
+        <div class="row">
+            <div class="col-sm">
+      <div class="form-group">
+        <label for="exampleInputEmail1">From</label>
+        <input  class="form-control" id="departing"  placeholder="Enter Departure Location">
+      </div>
+    </div>
+    <div class="col-sm">
+
+      <div class="form-group">
+        <label for="destination">Destination</label>
+        <input  class="form-control" id="destination" placeholder="Enter Destination">
+      </div>
+    </div>
+    <div class="col-sm">
+
+      <div class="form-group row">
+        <label for="Date"> Choose Date</label>
+        <div class="col-10">
+          <input class="form-control" type="date" value="1996-10-15" id="date">
+        </div>
+    </div>
+      <button type="submit" id='submit' class="btn btn-primary">Submit</button>
+
+    </form>
+    </div>
+
+    <div id="id01" class="modal">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <div class="container">
+
+        <button id='guestUser' type="submit"onclick="window.location.replace('./reserve.html')"  class="signupbtn">Sign Up</button>
+        <button id='guestUser' type="submit" onclick="window.location.replace('./guestReserve.html')" class="signupbtn">Continue As Guest</button>
+
+              <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+            
+            </div>
+
+      </div>
+
+
+      <div id="id02" class="modal">
+        <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <form class="modal-content" action="/action_page.php">
+          <div id='cards'class="container">
+            <h1>Choose the card you want to pay with</h1>
+           
+           
+           
+            
+           
+            <div class="clearfix">
+            </div>
+          </div>
+          <button type="button" onclick="document.getElementById('id02').style.display='none'" class="cancelbtn">Cancel</button>
+        </form>
+      </div>
+</body><script>
+    function sqlToJsDate(sqlDate){
+        var sqlDateArr1 = sqlDate.split("-");
+        var sYear = sqlDateArr1[0];
+        var sMonth = (Number(sqlDateArr1[1]) - 1).toString();
+        var sqlDateArr2 = sqlDateArr1[2].split(" ");
+        var sDay = sqlDateArr2[0].split("T")[0];
+        var sqlDateArr3 = sqlDateArr2[0].split(":");
+        var sHour = sqlDateArr3[0].split("T")[1];
+    
+        var sMinute = sqlDateArr3[1];
+        var sqlDateArr4 = sqlDateArr3[2].split(".");
+        //format of sqlDateArr4[] = ['ss','ms']
+        var sSecond = sqlDateArr4[0];
+        var sMillisecond = sqlDateArr4[1];
+         console.log(sYear, sMonth, sDay, sHour, sMinute)
+        return new Date(year=sYear,monthIndex=sMonth,day=sDay,hours=sHour,minutes=sMinute);
+    }
+    </script>
+    <script>
+      //handing when the user presses reserve a seat
+      const config = {
+    headers: { Authorization: `Bearer ${window.localStorage.getItem('token')}` }
+};
+    document.addEventListener("click",
+    
+    function askForDetails(e){
+        var element=e.target
+        if(element.id == 'chooseCard'){
+
+            e.preventDefault()
+            var flightId=window.localStorage.getItem('flightId')
+            //var flightId=element.value
+            window.localStorage.setItem('flightId',flightId)
+            console.log(window.localStorage.getItem("logged_in"))
+
+            if(!(window.localStorage.getItem("logged_in")=="false"||window.localStorage.getItem("logged_in")==null))
+              {
+               
+                      axios.post('http://localhost:8080/api/reservation/addReservation',config, { params:{
+                      
+                      userId: window.localStorage.getItem('userId'),
+                      flightId:flightId,
+                      }
+                        
+                      })
+                      .then(function (response) {
+                              if(response.data='Saved'){
+                                      window.location.replace("./reservationspage.html");
+                
+                          }
+                        })
+                      .catch(function (error) {
+                        console.log(error);
+                      })
+                }
+              else{
+            document.getElementById('id01').style.display='block'
+          }
+        }
+          if(element.id == 'reserve'){
+            window.localStorage.setItem('flightId',element.value)
+            if(!(window.localStorage.getItem("logged_in")=="false"||window.localStorage.getItem("logged_in")==null))
+              {
+            document.getElementById('id02').style.display='block'
+            var userId=window.localStorage.getItem('userId')
+    axios.post('http://localhost:8080/api/card/getCards',config, { params:{
+              
+              userId: userId,
+              
+          }
+            
+          })
+          .then(function (response) {
+            var user=response.data
+            console.log(response)
+              var cards=response.data
+              var body = document.getElementById('cards');
+            var tbl = document.createElement('table');
+            tbl.classList.add('table')
+            
+
+            tbl.style.width = '100%';
+            tbl.setAttribute('border', '1');
+            var tbdy = document.createElement('tbody');
+            for (var i = 0; i < cards.length; i++) {
+                var tr = document.createElement('tr');
+                
+                console.log('datestr')
+
+                var departing = document.createElement('td');
+                departing.appendChild(document.createTextNode(cards[i].cardname))
+                tr.appendChild(departing)
+                var destination = document.createElement('td');
+                destination.appendChild(document.createTextNode(cards[i].cardnum))
+                tr.appendChild(destination)
+                var date = document.createElement('td');
+                date.appendChild(document.createTextNode(cards[i].cardcvc))
+                tr.appendChild(date)
+                var name = document.createElement('td');
+                name.appendChild(document.createTextNode(cards[i].carddate))
+                tr.appendChild(name)
+               
+               
+
+                var date = document.createElement('td');
+                var b = document.createElement('button');
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",cards[i].card_id);
+                //setting the attribute of 
+                b.setAttribute("id",'chooseCard');
+
+                b.appendChild(document.createTextNode("Choose Card"));
+                date.appendChild(b)
+                tr.appendChild(date )
+
+               
+                
+                tbdy.appendChild(tr);
+            }
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl)
+            })
+          .catch(function (error) {
+            console.log(error);
+          })
+          }
+          else{
+            document.getElementById('id01').style.display='block'
+
+          }}
+         
+    })
+    
+    </script>
+    <script>
+       const config = {
+    headers: { Authorization: `Bearer ${window.localStorage.getItem('token')}` }
+};
+      
+      //handing when the submits their card details 
+    document.addEventListener("click",
+    function askForDetails(e){
+        var element=e.target
+          if(element.id == 'cardDetails'){
+
+            e.preventDefault()
+            var cardname=document.getElementById('modal1_name').value
+            var carnnum=document.getElementById('modal1_number').value
+            var cardcvc=document.getElementById('modal1_cvc').value
+            var carddate=document.getElementById('modal1_date').value
+            var userid= window.localStorage.getItem("userId");
+            var flightId=window.localStorage.getItem("flightId")
+            var userId=window.localStorage.getItem("userId")
+            console.log(userId,flightId)
+
+            axios.post('http://localhost:8080/flight/addCard',config, { params:{
+              
+            userId: userId,
+            cardname:cardname,
+            cardnum:carnnum,
+            cardcvc:cardcvc,
+            carddate:carddate,
+        }
+          
+        })
+        .then(function (response) {
+            if(response.data='success'){
+
+            }
+          })
+        .catch(function (error) {
+          console.log(error);
+        })
+       
+          }
+    })
+
+    </script>
+    <script>
+        const config = {
+    headers: { Authorization: `Bearer ${window.localStorage.getItem('token')}` }
+};
+      
+    //handles when the user is trying to submit their details
+    document.addEventListener("click",
+    function submit(e){
+        var element=e.target
+          if(element.id == 'guestUser'){
+            myStorage = window.localStorage;
+            e.preventDefault()
+            document.getElementById('id01').style.display='none'
+            document.getElementById('id02').style.display='block'
+            var fname=document.getElementById('modal_name').value
+            var modal_surname=document.getElementById('modal_surname').value
+            var modal_email=document.getElementById('modal_email').value
+            var modal_phone=document.getElementById('modal_phone').value
+            var modal_address=document.getElementById('modal_address').value
+            var modal_password=document.getElementById('modal_password').value
+            console.log(fname,modal_surname,modal_phone,modal_address)
+            axios.post('http://localhost:8080/flight/addUser',config, { params:{
+            
+              firstname: fname,
+              surname:modal_surname,
+              phone:modal_phone,
+              address:modal_address,
+              email:modal_email,
+              password:modal_password}
+            
+          })
+          .then(function (response) {
+              myStorage.setItem('userId',response.data)
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+         
+          
+            
+            }
+            if(element.id == 'cardDetails'){
+              e.preventDefault()
+              var card_name=document.getElementById('modal1_name').value
+              var card_number=document.getElementById('modal1_number').value
+              var card_cvc=document.getElementById('modal1_cvc').value
+              var card_date=document.getElementById('modal1_date').value
+              console.log(card_name,card_number,card_cvc)
+
+              
+
+            }
+    })
+
+    </script>
+    <script> 
+      //load login or logout buttons
+
+                var nav=document.getElementById("nav")
+                var b = document.createElement('button');
+                var b1 = document.createElement('button');
+                console.log(window.localStorage.getItem("logged_in")=="false")
+                if(window.localStorage.getItem("logged_in")=="false"||window.localStorage.getItem("logged_in")==null){
+
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",'login');
+                b.appendChild(document.createTextNode("login"));
+                nav.appendChild(b)
+                b1.setAttribute("class","btn");
+                b1.classList.add("btn-primary");
+                b1.setAttribute("value",'signUp');
+                b1.appendChild(document.createTextNode("Sign Up"));
+                nav.appendChild(b1)
+
+               }
+                else{
+                b.setAttribute("class","btn");
+                b.classList.add("btn-primary");
+                b.setAttribute("value",'logout');
+                b.appendChild(document.createTextNode("logout"));
+                nav.appendChild(b)
+                b1.setAttribute("class","btn");
+                b1.classList.add("btn-primary");
+                b1.setAttribute("value",'account');
+                b1.appendChild(document.createTextNode("My Account"));
+                nav.appendChild(b1)
+                }
+
+                document.addEventListener("click",
+                function(e) {
+                  if(e.target.value =="logout"){
+
+                    console.log(e.target.value)
+                    window.localStorage.setItem('logged_in', "false");
+                    window.localStorage.setItem('userId', null);
+                    window.localStorage.removeItem('user');
+
+                    location.reload();
+
+
+                  }
+                  if(e.target.value =="login"){
+
+                    console.log(e.target.value)
+                    window.location.replace("./login.html");
+
+
+}
+if(e.target.value =="signUp"){
+      console.log(e.target.value)
+      window.location.replace("./signUp.html");
+}
+if(e.target.value =="account"){
+      console.log(e.target.value)
+      window.location.replace("./editDetails.html");
+}
+                })
+
+                
+                
+                </script>
+<script>
+  //searching for flights
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+  document.getElementById("submit").addEventListener("click",
+  function searchFlights(e){
+
+     
+        e.preventDefault();
+        var departing=document.getElementById("departing").value
+        var destination=document.getElementById("destination").value
+        var date=document.getElementById("date").value
+        console.log(departing,destination,date)
+        axios.get( `http://localhost:8080/api/flight/search`, { params: { departing: departing, destination: destination, departureTime: date} }).then(function (response){
+            console.log(response)
+            var data=response.data
+            console.log(data)
+
+
+
+            var body = document.getElementsByTagName('body')[0];
+            var tbl = document.createElement('table');
+            tbl.classList.add('table')
+            
+
+            tbl.style.width = '100%';
+            tbl.setAttribute('border', '1');
+            var tbdy = document.createElement('tbody');
+            for (var i = 0; i < data.length; i++) {
+                var tr = document.createElement('tr');
+                    var datestr=sqlToJsDate(data[i].departureTime)
+                    console.log(datestr)
+                    datestr=datestr.getHours().toString()+':'+datestr.getMinutes().toString();
+                    var departing = document.createElement('td');
+                    departing.appendChild(document.createTextNode(data[i].departing))
+                    tr.appendChild(departing)
+                    var destination = document.createElement('td');
+                    destination.appendChild(document.createTextNode(data[i].destination))
+                    tr.appendChild(destination)
+                    var date = document.createElement('td');
+                    date.appendChild(document.createTextNode(datestr))
+                    tr.appendChild(date)
+                    var date = document.createElement('td');
+                    var b = document.createElement('button');
+                    b.setAttribute("class","btn");
+                    b.classList.add("btn-primary");
+                    b.setAttribute("value",data[i].id);
+                    //setting the attribute of 
+                    b.setAttribute("id",'reserve');
+
+                    b.appendChild(document.createTextNode("Reserve"));
+                    date.appendChild(b)
+                    tr.appendChild(date )
+                   
+                tbdy.appendChild(tr);
+            }
+            tbl.appendChild(tbdy);
+            body.appendChild(tbl)
+
+
+            
+        }).catch(function (error){
+            console.log(error)
+        });
+    })
+
+</script>
+<script>
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="loginstyle.css"/>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+  <form  style="border:1px solid #ccc">
+    <div class="container">
+      
+      <hr>
+      <button id='editcards'   >Edit Card Details</button>
+      <br/>
+      <br/>
+      
+      <button id='deleteAccount'   >Delete My Account</button>
+      <h1>Edit Your Details</h1>
+      <p>Edit the text in each box and submit</p>
+
+      
+          <label for="email"><b>Email</b></label>
+          <input id="email" type="text" placeholder="Enter Email" name="email" required>
+          <label for="email"><b>First Name</b></label>
+          <input id="fname" type="text" placeholder="Enter First Name" name="email" required>
+          <label for="surname"><b>Surename</b></label>
+          <input type="text" id="surname" placeholder="Enter Surename" name="email" required>
+          <label for="phone"><b>Phone Number</b></label>
+          <input type="text" id='phone' placeholder="Enter Phone Number" name="email" required>
+          <label for="address"><b>Address</b></label>
+          <input type="text" placeholder="Enter Address" id="address" required>
+          <label for="psw"><b>Password</b></label>
+          <input id="password" type="password" placeholder="Enter Password" name="psw" required>
+      
+         
+            <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+          </label>
+      
+          <p>By creating an account you agree to our <a href="#" style="color:dodgerblue">Terms & Privacy</a>.</p>
+      
+          <div class="clearfix">
+            <button type="button" id ="cancel" class="cancelbtn">Cancel</button>
+            <button type="submit" id="signUp" class="signupbtn">Submit</button>
+          </div>
+        </div>
+      </form>
+</body>
+<script>  
+document.getElementById('editcards').addEventListener('click', function editcards(e){
+
+  console.log('hello')
+  e.preventDefault()
+  window.location.replace('./editCards.html')
+})
+
+       
+    myStorage = window.localStorage;
+    console.log('user')
+
+    axios.post('http://localhost:8080/flight/getUser',null, { params:{
+    
+      userId: myStorage.getItem('userId'),
+      }
+    
+  })
+  .then(function (response) {
+     user=response.data
+    console.log(user)
+   document.getElementById('fname').setAttribute('value',user.firstname)
+   document.getElementById('surname').setAttribute('value',user.surname)
+   document.getElementById('email').setAttribute('value',user.email)
+   document.getElementById('phone').setAttribute('value',user.phone)
+   document.getElementById('address').setAttribute('value',user.address)
+   document.getElementById('password').setAttribute('value',user.password)
+
+   placeholder      
+
+   
+    console.log(fname,modal_surname,modal_phone,modal_address)
+    console.log(response);
+
+  })
+  .catch(function (error) {
+    console.log(error);
+  })
+   
+ 
+  
+    
+    
+   
+
+
+</script>
+<script>
+    //handles when the user is trying to submit their details
+    document.addEventListener("click",
+    function submit(e){
+        var element=e.target
+        if(element.id =="cancel"){
+            console.log(e.target.value)
+            window.location.replace("./index.html");
+        }
+          if(element.id == 'signUp'){
+            myStorage = window.localStorage;
+            e.preventDefault()
+           
+            var fname=document.getElementById('fname').value
+            var modal_surname=document.getElementById('surname').value
+            var modal_email=document.getElementById('email').value
+            var modal_phone=document.getElementById('phone').value
+            var modal_address=document.getElementById('address').value
+            var modal_password=document.getElementById('password').value
+            console.log(fname,modal_surname,modal_phone,modal_address)
+            axios.post('http://localhost:8080/flight/addCard',null, { params:{
+              
+              userId: userid,
+              cardname:cardname,
+              cardnum:carnnum,
+              cardcvc:cardcvc,
+              carddate:carddate,
+          }
+            
+          })
+          .then(function (response) {
+             
+            })
+          .catch(function (error) {
+            console.log(error);
+          })
+         
+          
+            
+            }
+            if(element.id == 'deleteAccount'){
+            myStorage = window.localStorage;
+            e.preventDefault()
+           
+          userid=myStorage.getItem('userId')
+            console.log(fname,modal_surname,modal_phone,modal_address)
+            axios.post('http://localhost:8080/flight/deleteUser',null, { params:{
+              
+              userId: userid,
+             
+          }
+            
+          })
+          .then(function (response) {
+            window.localStorage.removeItem('userId')
+            window.localStorage.removeItem('logged_in')
+
+             window.location.replace('./')
+            })
+          .catch(function (error) {
+            console.log(error);
+          })
+         
+          
+            
+            }
+            if(element.id == 'cardDetails'){
+              e.preventDefault()
+              var card_name=document.getElementById('modal1_name').value
+              var card_number=document.getElementById('modal1_number').value
+              var card_cvc=document.getElementById('modal1_cvc').value
+              var card_date=document.getElementById('modal1_date').value
+              console.log(card_name,card_number,card_cvc)
+  
+              
+  
+            }
+    })
+  
+    </script>
+</html>
