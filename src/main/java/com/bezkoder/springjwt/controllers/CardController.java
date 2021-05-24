@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,8 @@ public class CardController {
     private CardRepository cardRepository;
     @Autowired
 	UserRepository userRepository;
+  @Autowired
+  PasswordEncoder encoder;
     @PostMapping(path = "/getCards") 
   @CrossOrigin
 
@@ -46,7 +49,9 @@ public class CardController {
     		
 
     List<Card> cards = cardRepository.findByCardUser(uid);
-    
+    for(Card card:cards){
+      card.decrypt();
+    }
      return cards;
     
     
@@ -74,7 +79,7 @@ public class CardController {
     card.setCardname(cardname);
     card.setCarddate(strDate);
     card.setUser(userRepository.findById((long)uid).get());
-
+        card.encrypt();
     cardRepository.save(card);
 
  return "success";
@@ -87,7 +92,7 @@ public class CardController {
   public @ResponseBody Card getCard(@RequestParam int cardId) throws JsonProcessingException {
     Long uid=(long)cardId;
     Card card = cardRepository.findById(uid).get();
-    
+    card.decrypt();
      return card;
     
     

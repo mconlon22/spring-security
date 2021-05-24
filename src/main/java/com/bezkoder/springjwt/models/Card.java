@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.bezkoder.springjwt.security.services.AESEncrypt;
 @Entity
 @Table(name = "cards")
 
@@ -69,6 +71,15 @@ public Card(){}
         this.cardnum = cardnum;
         this.cardcvc = cardcvc;
         this.carddate = carddate;
+    }
+    public void encrypt(){
+        this.cardname=AESEncrypt.encrypt(cardnum);
+        
+    }
+    public void decrypt(){
+       
+        this.cardname=AESEncrypt.decrypt(cardnum);
+       
     }
 
     public User getUser() {
