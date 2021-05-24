@@ -50,6 +50,9 @@
 </body>
 <script>
   //handles when the user is trying to submit their details
+  if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
   document.addEventListener("click",
   function submit(e){
       var element=e.target

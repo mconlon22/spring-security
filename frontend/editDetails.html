@@ -64,7 +64,7 @@ document.getElementById('editcards').addEventListener('click', function editcard
     myStorage = window.localStorage;
     console.log('user')
 
-    axios.post('http://localhost:8080/flight/getUser',null, { params:{
+    axios.post('http://localhost:8080/api/auth/getUser',null, { params:{
     
       userId: myStorage.getItem('userId'),
       }
@@ -119,7 +119,7 @@ document.getElementById('editcards').addEventListener('click', function editcard
             var modal_address=document.getElementById('address').value
             var modal_password=document.getElementById('password').value
             console.log(fname,modal_surname,modal_phone,modal_address)
-            axios.post('http://localhost:8080/flight/addCard',null, { params:{
+            axios.post('http://localhost:8080/api/card/addCard',null, { params:{
               
               userId: userid,
               cardname:cardname,

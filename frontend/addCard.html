@@ -38,6 +38,10 @@
       </form>
 </body>
 <script>
+if (window.localStorage.getItem('token')!=null){
+  console.log('common')
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
      document.addEventListener("click",
     function pay(e){
         var element=e.target
@@ -52,7 +56,7 @@
             var flightId=window.localStorage.getItem("flightId")
             console.log(userid,flightId)
 
-            axios.post('http://localhost:8080/flight/addCard',null, { params:{
+            axios.post('http://localhost:8080/api/card/addCard',null, { params:{
               
             userId: userid,
             cardname:cardname,

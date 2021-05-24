@@ -397,7 +397,9 @@ if(e.target.value =="account"){
                 </script>
 <script>
   //searching for flights
+  if (window.localStorage.getItem('token')!=null){
   axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
   document.getElementById("submit").addEventListener("click",
   function searchFlights(e){
 

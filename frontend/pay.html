@@ -38,6 +38,9 @@
       </form>
 </body>
 <script>
+if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
      document.addEventListener("click",
     function pay(e){
         var element=e.target

@@ -38,16 +38,13 @@
 <script>
     //creates the table 
     var userId=window.localStorage.getItem('userId')
-    const config = {
-       headers: { 'Authorization': `${window.localStorage.getItem('token')}` }
-   };
+    
 
-const bodyParameters = {
-   key: "value"
-};
-axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
 
-    axios.post('http://localhost:8080/api/reservation/getUserReservations',null,bodyParameters
+if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
+    axios.post('http://localhost:8080/api/reservation/getUserReservations'
 )
           .then(function (response) {
             var user=response.data
@@ -173,6 +170,7 @@ if(e.target.value =="account"){
                 
                 </script>
 <script>
+  
     function sqlToJsDate(sqlDate){
         var sqlDateArr1 = sqlDate.split("-");
         var sYear = sqlDateArr1[0];
@@ -192,16 +190,18 @@ if(e.target.value =="account"){
     }
 
 //handles canceling flights
+if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
     document.addEventListener("click",
                 function(e) {
                   if(e.target.id =="Cancel"){
                     var flightId=e.target.value;
                     console.log(e.target.value)
+                    
                    
 
-                            axios.post('http://localhost:8080/flight/removeReservation',null, { params:{
-                        
-                        userId: window.localStorage.getItem('userId'),
+                            axios.post('http://localhost:8080/api/reservation/removeReservation', null,{ params:{
                                 flightId: flightId
                     }
                     

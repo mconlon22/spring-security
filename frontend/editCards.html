@@ -38,14 +38,12 @@
 </body>
 <script>
     //creates the table 
+    if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+  console.log('working')
+}
     var userId=window.localStorage.getItem('userId')
-    axios.post('http://localhost:8080/flight/getCards',null, { params:{
-              
-              userId: userId,
-              
-          }
-            
-          })
+    axios.post('http://localhost:8080/api/card/getCards')
           .then(function (response) {
             var user=response.data
             console.log(response)
@@ -170,6 +168,10 @@
   
 
 //handles canceling flights
+if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+  console.log('working')
+}
     document.addEventListener("click",
                 function(e) {
                 var cardId=e.target.value;
@@ -180,12 +182,12 @@
 
                   }
                   if(e.target.id =="add"){
-                      window.location.replace("./addcard.html")
+                      window.location.replace("./addCard.html")
                   }
                   if(e.target.id =="Delete"){
                    
 
-                            axios.post('http://localhost:8080/flight/removeCard',null, { params:{
+                            axios.post('http://localhost:8080/api/card/removeCard',null, { params:{
                         
                                 cardId: cardId,
                     }

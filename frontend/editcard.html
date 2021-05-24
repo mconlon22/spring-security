@@ -38,8 +38,10 @@
       </form>
 </body>
 <script>
-    
-    axios.post('http://localhost:8080/flight/getCard',null, { params:{
+if (window.localStorage.getItem('token')!=null){
+  axios.defaults.headers.common = {'Authorization': `Bearer ${window.localStorage.getItem('token')}`}
+}
+    axios.post('http://localhost:8080/api/card/getCard',null, { params:{
     
     cardId: window.localStorage.getItem('cardId'),
     }
@@ -66,7 +68,7 @@
                 var cardcvc=document.getElementById('cardcvc').value
                 var carddate=document.getElementById('date').value
                 console.log(cardname,cardnum,cardcvc)
-                axios.post('http://localhost:8080/flight/editCard',null, { params:{
+                axios.post('http://localhost:8080/api/card/editCard',null, { params:{
                 
                 cardId: window.localStorage.getItem('cardId'),
                 cardname:cardname,
