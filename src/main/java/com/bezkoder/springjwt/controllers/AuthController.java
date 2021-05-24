@@ -30,6 +30,7 @@ import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
+import com.bezkoder.springjwt.security.services.Validator;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -50,6 +51,8 @@ public class AuthController {
 
 	@Autowired
 	JwtUtils jwtUtils;
+	@Autowired
+	Validator validator;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -85,6 +88,17 @@ public class AuthController {
 					.badRequest()
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
+		if (validator.checkPassword(signUpRequest.getPassword())!="valid") {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse(validator.checkPassword(signUpRequest.getPassword())));
+		}
+		if (validator.checkEmail(signUpRequest.getEmail())) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Invalid Email"));
+		}
+
 		
 		
 
