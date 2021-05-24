@@ -27,7 +27,8 @@
       
           <label for="psw"><b>Password</b></label>
           <input id="password"  type="password" placeholder="Enter Password" name="psw" required>
-      
+          <p id='incorrect'>Incorrect username or password</p>
+
           <button id="login" type="submit">Login</button>
           <label>
             <input type="checkbox" checked="checked" name="remember"> Remember me
@@ -43,8 +44,8 @@
 </body>
 
 <script>
-    document.addEventListener('click',function(e){
-        
+    document.getElementById('login').addEventListener('click',function(e){
+
         e.preventDefault();
         var email =document.getElementById('email').value
         var password=document.getElementById('password').value
@@ -78,6 +79,9 @@ console.log(email,password)
 
 
 
+            }).catch((err)=>{
+                document.getElementById('incorrect').style.visibility ="visible"
+                console.log('err')
             })
 
         }
