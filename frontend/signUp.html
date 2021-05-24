@@ -69,25 +69,7 @@
           var modal_password=document.getElementById('password').value
           let data = {username:fname,email:modal_email,password:modal_password,role:["user"]}
           console.log(fname,modal_surname,modal_phone,modal_address)
-
-         let data = {
-            firstname: fname,
-            surname:modal_surname,
-            phone:modal_phone,
-            address:modal_address,
-            email:modal_email,
-            username:modal_email,
-            password:modal_password
-         }
-         let config = {
-            headers: { 
-              'Accept': 'application/json',
-              'Content-Type': 'application/json' 
-            }
-          }
-
-
-          axios.post('http://localhost:8080/api/auth/signup', data, config)
+          axios.post('http://localhost:8080/api/auth/signup',data)
         .then(function (response) {
             myStorage.setItem('userId',response.data)
           console.log(response);
