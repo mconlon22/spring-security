@@ -7,16 +7,13 @@ import java.util.List;
 
 import com.bezkoder.springjwt.models.Card;
 import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.CardRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
-import com.bezkoder.springjwt.security.services.Validator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/card")
@@ -37,13 +33,7 @@ public class CardController {
     @Autowired
 	UserRepository userRepository;
   @Autowired
-
   PasswordEncoder encoder;
-  
-  
-@Autowired
-Validator validator;
-
     @PostMapping(path = "/getCards") 
   @CrossOrigin
 
@@ -69,7 +59,7 @@ Validator validator;
   }
   @PostMapping(path="/addCard") // Map ONLY POST Requests
   @CrossOrigin
-  public @ResponseBody ResponseEntity<?> addCard(@RequestParam String cardname,
+  public @ResponseBody String addCard(@RequestParam String cardname,
       @RequestParam String cardnum, @RequestParam String cardcvc, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date carddate) {
         // This returns a JSON or XML with the users
         DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh");  
@@ -88,17 +78,11 @@ Validator validator;
     card.setCardnum(cardnum);
     card.setCardname(cardname);
     card.setCarddate(strDate);
-    
-    if (validator.checkCard(card)!="valid") {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse(validator.checkCard(card)));
-		}
     card.setUser(userRepository.findById((long)uid).get());
         card.encrypt();
     cardRepository.save(card);
 
-		return ResponseEntity.ok(new MessageResponse("Card Added Successfully"));
+ return "success";
     
   }
 

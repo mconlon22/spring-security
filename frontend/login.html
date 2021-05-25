@@ -27,8 +27,7 @@
       
           <label for="psw"><b>Password</b></label>
           <input id="password"  type="password" placeholder="Enter Password" name="psw" required>
-          <p id='incorrect'>Incorrect username or password</p>
-
+      
           <button id="login" type="submit">Login</button>
           <label>
             <input type="checkbox" checked="checked" name="remember"> Remember me
@@ -47,8 +46,6 @@
     
     document.addEventListener('click',function(e){
         e.preventDefault();
-        let loginAttempts=parseInt(window.localStorage.getItem('loginAttempts'))
-  
         var email =document.getElementById('email').value
         var password=document.getElementById('password').value
 console.log(email,password)
@@ -57,7 +54,7 @@ console.log(email,password)
             window.location.replace("./index.html");
         }
         if(e.target.id=='login'){
-        
+        }
         let config = {
             headers: { 
         'Accept': 'application/json',
@@ -65,24 +62,6 @@ console.log(email,password)
     }}
    
         let data = {username:email,password:password}
-        console.log(loginAttempts)
-        if(window.localStorage.getItem('lockTime')!=null){
-        const lockTime=Date.parse(window.localStorage.getItem('lockTime'))
-                console.log(lockTime)
-
-        const currentTime=new Date()
-        console.log(currentTime.getTime())
-        const timeRemaining=20-( currentTime.getTime()-lockTime)/1000/60;
-        if(timeRemaining<0){
-            window.localStorage.removeItem('lockTime')
-            window.localStorage.removeItem('loginAttempts')
-            loginAttempts=0
-
-
-        }
-    }
-
-        if(loginAttempts<4||isNaN(loginAttempts)){
     
 
             axios.post('http://localhost:8080/api/auth/signin',data,config)
@@ -99,38 +78,9 @@ console.log(email,password)
 
 
 
-            }).catch((err)=>{
-                document.getElementById('incorrect').style.visibility ="visible"
-                console.log(err.response)
-                
+            })
 
-                
-                if(isNaN(loginAttempts)){
-                    loginAttempts=0
-
-                }
-                loginAttempts+=1
-                if(loginAttempts==4){
-                    var d = new Date();
-                    var n = d.toString();
-                    window.localStorage.setItem('lockTime',n)
-                }
-                window.localStorage.setItem('loginAttempts',loginAttempts.toString())
-                console.log(loginAttempts)
-
-            })}
-            else{
-                const lockTime=Date.parse(window.localStorage.getItem('lockTime'))
-                console.log(lockTime)
-
-        const currentTime=new Date()
-        console.log(currentTime.getTime())
-        const timeRemaining=20-( currentTime.getTime()-lockTime)/1000/60;
-        document.getElementById('incorrect').style.visibility ="visible"
-        document.getElementById('incorrect').innerHTML='You Have Tried To login To Many Times Try again in ' +timeRemaining+ ' minutes'
-        console.log(timeRemaining)}
-
-        }}
+        }
     )
 </script>
 </html>

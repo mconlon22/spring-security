@@ -16,6 +16,9 @@ import javax.validation.constraints.Size;
 			@UniqueConstraint(columnNames = "email") 
 		})
 public class User {
+	
+	public long LOCK_DURATION = 1000*60*20;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -33,14 +36,7 @@ public class User {
 	@Size(max = 120)
 	private String password;
 
-	@Column(name = "account_non_locked")
-    private boolean accountNonLocked;
-     
-    @Column(name = "failed_attempt")
-    private int failedAttempt;
-     
-    @Column(name = "lock_time")
-    private Date lockTime;
+
 
 	@OneToMany(mappedBy="user")
      private Set<Card> cards;
@@ -56,25 +52,15 @@ public class User {
     @Column(name = "phone")
     private String phone;
 	
-	public void setAccountNonLocked(boolean accountNonLocked) {
-		this.accountNonLocked = accountNonLocked;
-	}
+	
+	@Column(name = "failed_attempts")
+	private int failedAttempts;
 
-	public int getFailedAttempt() {
-		return failedAttempt;
-	}
+	@Column(name = "locked")
+	private boolean locked;
 
-	public void setFailedAttempt(int failedAttempt) {
-		this.failedAttempt = failedAttempt;
-	}
-
-	public Date getLockTime() {
-		return lockTime;
-	}
-
-	public void setLockTime(Date lockTime) {
-		this.lockTime = lockTime;
-	}
+	@Column(name = "lock_time")
+	private Date lockTime;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles", 
@@ -89,7 +75,9 @@ public class User {
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.accountNonLocked=true;
+		this.failedAttempts =0;
+		this.locked = false;
+		this.lockTime = null;
 	}
 	public Set<Flight> getReservations() {
         return reservations;
@@ -113,9 +101,6 @@ public class User {
 
 	public String getUsername() {
 		return username;
-	}
-	public Boolean isAccountNonLocked(){
-		return accountNonLocked;
 	}
 
 	public void setUsername(String username) {
@@ -145,4 +130,29 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
+	public int getFailedAttempts() {
+		return failedAttempts;
+	}
+
+	public void setFailedAttempts(int attempts) {
+		this.failedAttempts = attempts;
+	}
+
+	public boolean getLocked() {
+		return locked;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+
+	public Date getLockTime() {
+		return lockTime;
+	}
+
+	public void setLockTime(Date time) {
+		this.lockTime = time;
+	}
+
 }

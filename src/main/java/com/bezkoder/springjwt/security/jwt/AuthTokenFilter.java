@@ -1,7 +1,6 @@
 package com.bezkoder.springjwt.security.jwt;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -45,11 +44,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		} catch (Exception e) {
-			Enumeration params = request.getParameterNames();
-				while(params.hasMoreElements()){
-					String paramName = (String)params.nextElement();
-					System.out.println(paramName + " = " + request.getParameter(paramName));
-				}
 			logger.error("Cannot set user authentication: {}", e);
 		}
 

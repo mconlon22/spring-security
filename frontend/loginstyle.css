@@ -22,10 +22,6 @@ form {
     cursor: pointer;
     width: 100%;
   }
-  #incorrect{
-    visibility:hidden;
-    color:red;
-  }
   
   /* Add a hover effect for buttons */
   button:hover {
