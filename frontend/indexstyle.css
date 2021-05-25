@@ -10,7 +10,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
           border: none;
           background: #f1f1f1;
         }
-        
+        #incorrect{
+          visibility:hidden;
+          color:red;
+        }
         /* Add a background color when the inputs get focus */
         input[type=text]:focus, input[type=password]:focus {
           background-color: #ddd;

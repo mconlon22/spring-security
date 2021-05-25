@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="loginstyle.css"/>
+    <link rel="stylesheet" href="signup.css"/>
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -13,11 +13,12 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-    <form action="/index.html" style="border:1px solid #ccc">
+    <form action="action_page.php" style="border:1px solid #ccc">
         <div class="container">
           <h1>Sign Up</h1>
           <p>Please fill in this form to create an account.</p>
           <hr>
+          <p id='incorrect'></p>
       
           <label for="email"><b>Email</b></label>
           <input id="email" type="text" placeholder="Enter Email" name="email" required>
@@ -30,8 +31,7 @@
           <label for="address"><b>Address</b></label>
           <input type="text" placeholder="Enter Address" id="address" required>
           <label for="psw"><b>Password</b></label>
-          <input id="password" type="password" placeholder="Enter Password" name="psw" required>
-      
+          <input type="password" id="password" name="psw" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>      
           <label for="psw-repeat"><b>Repeat Password</b></label>
           <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
       
@@ -69,25 +69,7 @@
           var modal_password=document.getElementById('password').value
           let data = {username:fname,email:modal_email,password:modal_password,role:["user"]}
           console.log(fname,modal_surname,modal_phone,modal_address)
-
-         let data = {
-            firstname: fname,
-            surname:modal_surname,
-            phone:modal_phone,
-            address:modal_address,
-            email:modal_email,
-            username:modal_email,
-            password:modal_password
-         }
-         let config = {
-            headers: { 
-              'Accept': 'application/json',
-              'Content-Type': 'application/json' 
-            }
-          }
-
-
-          axios.post('http://localhost:8080/api/auth/signup', data, config)
+          axios.post('http://localhost:8080/api/auth/signup',data)
         .then(function (response) {
             myStorage.setItem('userId',response.data)
           console.log(response);
@@ -95,7 +77,12 @@
 
         })
         .catch(function (error) {
-          console.log(error);
+          console.log(error.response.data.message);
+      console.log(error.response.status);
+      console.log(error.response.headers);
+      let errormessage=document.getElementById('incorrect')
+      errormessage.style.visibility='visible'
+      errormessage.innerText=error.response.data.message
         })
        
         

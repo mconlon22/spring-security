@@ -73,13 +73,20 @@ public Card(){}
         this.carddate = carddate;
     }
     public void encrypt(){
-        this.cardname=AESEncrypt.encrypt(cardnum);
+        this.cardname=AESEncrypt.encrypt(cardname);
+        this.cardnum=AESEncrypt.encrypt(cardnum);
+        this.cardcvc=AESEncrypt.encrypt(cardcvc);
+
+        this.cardnum=AESEncrypt.encrypt(cardnum);
         
     }
     public void decrypt(){
        
-        this.cardname=AESEncrypt.decrypt(cardnum);
-       
+        this.cardname=AESEncrypt.decrypt(cardname);
+        this.cardnum=AESEncrypt.decrypt(cardnum);
+        this.cardcvc=AESEncrypt.decrypt(cardcvc);
+
+        this.cardnum=AESEncrypt.decrypt(cardnum);       
     }
 
     public User getUser() {

@@ -60,7 +60,7 @@ public class User {
 	private boolean locked;
 
 	@Column(name = "lock_time")
-	private Date lockTime;
+	private long lockTime;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles", 
@@ -77,7 +77,7 @@ public class User {
 		this.password = password;
 		this.failedAttempts =0;
 		this.locked = false;
-		this.lockTime = null;
+		this.lockTime = 0;
 	}
 	public Set<Flight> getReservations() {
         return reservations;
@@ -147,11 +147,11 @@ public class User {
 		this.locked = locked;
 	}
 
-	public Date getLockTime() {
+	public long getLockTime() {
 		return lockTime;
 	}
 
-	public void setLockTime(Date time) {
+	public void setLockTime(Long time) {
 		this.lockTime = time;
 	}
 

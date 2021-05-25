@@ -3,16 +3,15 @@ package com.bezkoder.springjwt.controllers;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.security.auth.message.AuthException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +32,7 @@ import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
+import com.bezkoder.springjwt.security.services.Validator;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -43,8 +43,8 @@ public class AuthController {
 	AuthenticationManager authenticationManager;
 
 	@Autowired
-	static UserRepository userRepository;
-	
+	UserRepository userRepository;
+
 	@Autowired
 	RoleRepository roleRepository;
 
@@ -53,65 +53,79 @@ public class AuthController {
 
 	@Autowired
 	JwtUtils jwtUtils;
+	@Autowired
+	Validator validator;
 
-	static User user;
-	public static void failedLogin() {
-		System.out.println("NO AUTH");
-		if (user!=null) {
-			System.out.println("USER: " + user.getEmail());
-			if (user.getLocked()) {
-				System.out.println("LOCKED");
-
-				Date currTime = new Date();
-				Date lockTime = user.getLockTime();
-
-				if (lockTime.getTime()+user.LOCK_DURATION < currTime.getTime()) {
-					user.setFailedAttempts(0);
-					user.setLocked(false);
-					user.setLockTime(null);
-					
-				}
-			}
-			if (user.getFailedAttempts() < 3) {
-				System.out.println("Incrementing failures");
-				user.setFailedAttempts(user.getFailedAttempts()+1);
-				System.out.println(user.getFailedAttempts());
-				userRepository.save(user);
-			}
-
-			if (3 <= user.getFailedAttempts() && !user.getLocked()) {
-				user.setLocked(true);
-				user.setLockTime(new Date());
-			}
-		}
-	}
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-		System.out.println("Starting auth process");
-		user = userRepository.findByUsername(loginRequest.getUsername()).get();
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-		System.out.println("Attempted Auth");
-		
+		Authentication authentication = null;
+		User user = userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
 
-		if (authentication.isAuthenticated() && user.getLocked()) {
-			authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), ""));
+		//logic for locked user
+		if (user!=null && user.getLocked()) {
+			long currTime = new Date().getTime();
+			long lockTime = user.getLockTime();
+			//unlock if time is ready
+			if (lockTime+user.LOCK_DURATION < currTime) {
+				user.setLockTime((long )0);
+				user.setLocked(false);
+				user.setFailedAttempts(0);
+				userRepository.save(user);
+			}
+			//otherwise change credentials to empty strings to prevent login for locked user
+			else {
+				System.out.println("This user is locked out until: " + (new Date(user.getLockTime()+user.LOCK_DURATION).toString()));
+				loginRequest.setUsername("");
+				loginRequest.setPassword("");
+			} 
 		}
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+		try {
+			authentication = authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		} catch(BadCredentialsException e) {
+			//we catch the bad credential exceeption so failed authentication attempts can be handled in the authController
+		}
+			//if authenticated allow user to login
+			if (authentication != null) {
+				user.setFailedAttempts(0);
+				userRepository.save(user);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			String jwt = jwtUtils.generateJwtToken(authentication);
+			
+			UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
+			List<String> roles = userDetails.getAuthorities().stream()
+					.map(item -> item.getAuthority())
+					.collect(Collectors.toList());
 
-		return ResponseEntity.ok(new JwtResponse(jwt, 
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
-												 roles));
-	}
+			return ResponseEntity.ok(new JwtResponse(jwt, 
+													userDetails.getId(), 
+													userDetails.getUsername(), 
+													userDetails.getEmail(), 
+													roles));
+			}
+
+			//otherwise handle bad credentials
+			else {
+				//if the username is valid 
+				if (user!=null) {
+					if (user.getFailedAttempts() < 3) {
+						user.setFailedAttempts(user.getFailedAttempts()+1);
+						userRepository.save(user);
+
+					}
+					
+					if (!user.getLocked() && 3 <= user.getFailedAttempts()) {
+						user.setLocked(true);
+						long lockTime =new Date().getTime();
+						user.setLockTime(lockTime);
+						userRepository.save(user);
+
+					}
+					
+				}
+				authentication = authenticationManager.authenticate( new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+				return null;
+			}
+		}
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -126,6 +140,19 @@ public class AuthController {
 					.badRequest()
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
+		if (validator.checkPassword(signUpRequest.getPassword())!="valid") {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse(validator.checkPassword(signUpRequest.getPassword())));
+		}
+		if (validator.checkEmail(signUpRequest.getEmail())) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Invalid Email"));
+		}
+
+		
+		
 
 		// Create new user's account
 		User user = new User(signUpRequest.getUsername(), 
