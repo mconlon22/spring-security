@@ -5,16 +5,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.repository.UserRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDetailsImpl implements UserDetails {
 	private static final long serialVersionUID = 1L;
-
+	@Autowired
+	UserRepository userRepository;
 	private Long id;
 
 	private String username;
@@ -78,7 +81,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public boolean isAccountNonLocked() {
-		return true;
+		return userRepository.findById(id).get().isAccountNonLocked();
 	}
 
 	@Override

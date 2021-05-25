@@ -10,7 +10,8 @@ public class SignupRequest {
     private String username;
  
     @NotBlank
-   
+    @Size(max = 50,message = "must be less than 50 characters")
+    @Email(message = "invalid email")
     private String email;
     
     private Set<String> role;
